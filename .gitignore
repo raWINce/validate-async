@@ -1,0 +1,4 @@
+# for test coverage report
+.nyc_output
+
+node_modules

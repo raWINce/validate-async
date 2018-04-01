@@ -1,0 +1,44 @@
+{
+  "name": "validate-async",
+  "version": "0.1.0",
+  "author": "Raoul Venn",
+  "description": "Asynchronous validation in javascript - made easy",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js  --fix",
+    "test": "cross-env NODE_ENV=test jest",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "nyc npm run test",
+    "validate": "npm-run-all --parallel test lint",
+    "precommit": "npm run validate",
+    "prepush": "npm run validate"
+  },
+  "keywords": [
+    "functional",
+    "asynchronous",
+    "javascript",
+    "futures",
+    "validation",
+    "monad"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "fluture": "^8.0.2",
+    "ramda": "^0.25.0",
+    "ramda-adjunct": "^2.6.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.1.4",
+    "eslint": "^4.19.1",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.10.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "husky": "^0.14.3",
+    "jest": "^22.4.3",
+    "npm-run-all": "^4.1.2",
+    "nyc": "^11.6.0"
+  }
+}
