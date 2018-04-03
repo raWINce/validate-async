@@ -5,7 +5,7 @@ const R = require('ramda')
 // toFuture :: Future Err a | Promise a Err | a -> Future Err a
 const toFuture = R.cond([
     [R.is(Future), R.identity],
-    [R.is(Promise), Future.tryP],
+    [R.is(Promise), x => Future.tryP(_ => x)],
     [R.T, Future.of],
 ])
 
