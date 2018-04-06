@@ -10,5 +10,4 @@ const delayP = R.curry((timeInMs, f) => (...args) =>
 const delayF = R.curry((timeInMs, f) => (...args) =>
     Future.after(timeInMs, f).map(R.apply(R.__, args)))
 
-
 module.exports = { delayP, delayF }
