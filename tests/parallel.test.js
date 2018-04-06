@@ -1,30 +1,16 @@
 const Future = require('fluture')
-const R = require('ramda')
 
 const V = require('../src')
 const P = require('../src/Predicates')
+const { delayP, delayF } = require('./helpers')
 
-
-// propIsNumber :: String -> Obj -> Boolean
-const propIsNumber = R.propSatisfies(R.is(Number))
-
-// propIsNonEmptyArray :: String -> Obj -> Boolean
-const propIsNonEmptyArray = R.propSatisfies(R.both(R.is(Array), P.isNotEmpty))
-
-// delayP :: Number -> Function f -> * -> Promise(f(*))
-const delayP = R.curry((timeInMs, f) => (...args) =>
-    new Promise((resolve, reject) => setTimeout(_ => resolve(f(...args)), timeInMs)))
-
-// delayP :: Number -> Function f -> * -> Future(f(*))
-const delayF = R.curry((timeInMs, f) => (...args) =>
-    Future.after(timeInMs, f).map(R.apply(R.__, args)))
 
 describe('func `V.parallel`', () => {
     it('accept valid data', () => {
         const validator = V.parallel(
-            [propIsNonEmptyArray('a'), 'empty a'],
-            [propIsNonEmptyArray('b'), 'empty b'],
-            [propIsNumber('c'), 'no number c'],
+            [P.propIsNonEmptyArray('a'), 'empty a'],
+            [P.propIsNonEmptyArray('b'), 'empty b'],
+            [P.propIsNumber('c'), 'no number c'],
         )
         const obj = { a: ['bla'], b: ['hello'], c: 9 }
 
@@ -33,18 +19,18 @@ describe('func `V.parallel`', () => {
 
     it('return without eror with mixed validator', () => {
         const promiseValidator = V.by(
-            delayP(50, propIsNonEmptyArray('a')),
+            delayP(50, P.propIsNonEmptyArray('a')),
             'empty a'
         )
         const futureValidator = V.by(
-            delayF(50, propIsNonEmptyArray('b')),
+            delayF(50, P.propIsNonEmptyArray('b')),
             'empty b'
         )
 
         const validator = V.parallel(
             promiseValidator,
             futureValidator,
-            [delayP(50, propIsNumber('c')), 'no number c'],
+            [delayP(50, P.propIsNumber('c')), 'no number c'],
         )
         const obj = { a: ['bla'], b: ['hello'], c: 9 }
 
@@ -53,9 +39,9 @@ describe('func `V.parallel`', () => {
 
     it('reject invalid object', () => {
         const validator = V.parallel(
-            [propIsNonEmptyArray('a'), 'empty a'],
-            [propIsNonEmptyArray('b'), 'empty b'],
-            [propIsNumber('c'), 'no number c'],
+            [P.propIsNonEmptyArray('a'), 'empty a'],
+            [P.propIsNonEmptyArray('b'), 'empty b'],
+            [P.propIsNumber('c'), 'no number c'],
         )
         const invalidObj ={ a: ['hi'], b: ['jo'], c: 'not a number' }
 
@@ -86,15 +72,15 @@ describe('func `V.parallel`', () => {
     })
 
     it('reject invalid object with mixed validators', () => {
-        const promiseValidator = V.by(delayP(50, propIsNonEmptyArray('a')), 'empty a')
+        const promiseValidator = V.by(delayP(50, P.propIsNonEmptyArray('a')), 'empty a')
         const futureValidator = V.by(
-            o => delayF(50, propIsNonEmptyArray('b')),
+            o => delayF(50, P.propIsNonEmptyArray('b')),
             'empty b'
         )
 
         const validator = V.parallel(
             promiseValidator,
-            [delayP(50, propIsNumber('c')), 'no number c'],
+            [delayP(50, P.propIsNumber('c')), 'no number c'],
             futureValidator,
         )
         const invalidObj = { a: ['a'] }
@@ -108,9 +94,9 @@ describe('func `V.parallel`', () => {
 
     it('output array of errors in correct order', () => {
         const validator = V.parallel(
-            [propIsNonEmptyArray('b'), 'empty b'],
-            [delayP(50, propIsNumber('c')), 'no number c'],
-            [propIsNonEmptyArray('a'), 'empty a'],
+            [P.propIsNonEmptyArray('b'), 'empty b'],
+            [delayP(50, P.propIsNumber('c')), 'no number c'],
+            [P.propIsNonEmptyArray('a'), 'empty a'],
         )
 
         return expect(validator({}).promise()).rejects.toEqual([
